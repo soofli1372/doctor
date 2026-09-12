@@ -62,7 +62,6 @@
             btn.innerText = "در حال ثبت‌نام...";
             btn.disabled = true;
 
-            // اطلاعات دیتابیس شما
             const SUPABASE_URL = 'https://bvtabwwofmxzuknrliqd.supabase.co';
             const SUPABASE_KEY = 'sb_publishable_9ru-fHj17h_ET7KduHLGIg_gmDsOAYR';
 
@@ -75,7 +74,6 @@
             };
 
             try {
-                // ارسال مستقیم اطلاعات به دیتابیس بدون نیاز به کتابخانه
                 const response = await fetch(`${SUPABASE_URL}/rest/v1/profiles`, {
                     method: 'POST',
                     headers: {
@@ -89,15 +87,19 @@
 
                 if (!response.ok) {
                     const errorData = await response.json();
-                    throw new Error(errorData.message || 'خطایی در ثبت‌نام رخ داد');
+                    // تشخیص کد خطای تکراری بودن (Duplicate Key) در Postgres
+                    if (errorData.code === '23505' || errorData.message.includes('duplicate')) {
+                        throw new Error("این ایمیل یا شماره موبایل قبلاً ثبت شده است. لطفاً از اطلاعات دیگری استفاده کنید.");
+                    } else {
+                        throw new Error(errorData.message || 'خطایی در ثبت‌نام رخ داد');
+                    }
                 }
 
                 alert("ثبت‌نام با موفقیت انجام شد دکتر عزیز! ❤️");
                 window.location.href = "index.html";
 
             } catch (err) {
-                console.error("Error:", err);
-                alert("⚠️ خطا: " + err.message + "\nحتماً RLS را در پنل Supabase غیرفعال کنید.");
+                alert("⚠️ " + err.message);
             } finally {
                 btn.innerText = "تکمیل ثبت‌نام";
                 btn.disabled = false;
