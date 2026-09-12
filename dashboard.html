@@ -3,21 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>داشبورد تعاملی پزشکان</title>
+    <title>پنل جامع پزشکان</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@100;400;700&display=swap');
         body { font-family: 'Vazirmatn', sans-serif; }
-        .profile-banner { 
-            height: 120px; 
-            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); 
-            background-image: url('https://www.transparenttextures.com/patterns/cubes.png');
-        }
+        .profile-banner { height: 160px; background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); }
+        .tab-active { border-bottom: 4px solid #2563eb; color: #2563eb; font-weight: bold; }
     </style>
 </head>
 <body class="bg-slate-50 min-h-screen">
 
-    <nav class="bg-white shadow-sm border-b border-blue-100 px-6 py-4 flex justify-between items-center">
+    <nav class="bg-white shadow-sm border-b border-blue-100 px-6 py-4 flex justify-between items-center sticky top-0 z-40">
         <div class="flex items-center gap-2">
             <div class="bg-blue-600 p-2 rounded-lg text-white font-bold">⚕️</div>
             <span class="font-bold text-gray-800 text-lg">شبکه تعاملی پزشکان</span>
@@ -25,83 +22,97 @@
         <button id="logout-btn" class="text-red-500 hover:bg-red-50 px-4 py-2 rounded-xl transition-all border border-red-200 text-sm">خروج</button>
     </nav>
 
-    <main class="p-4 max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <!-- منوی ناوبری (Tabs) -->
+    <div class="bg-white shadow-sm border-b border-gray-100 flex justify-around max-w-2xl mx-auto mt-2">
+        <button onclick="switchTab('profile-tab')" id="btn-profile" class="flex-1 py-4 text-gray-500 transition-all tab-active">👤 پروفایل</button>
+        <button onclick="switchTab('questions-tab')" id="btn-questions" class="flex-1 py-4 text-gray-500 transition-all">❓ سوالات</button>
+    </div>
 
-        <!-- ستون راست: پروفایل پیشرفته -->
-        <div class="lg:col-span-1 space-y-6">
+    <main class="p-4 max-w-6xl mx-auto">
+
+        <!-- بخش اول: پروفایل -->
+        <div id="profile-tab" class="tab-content space-y-6">
             <div class="bg-white rounded-3xl shadow-sm border border-blue-100 overflow-hidden">
-                <!-- بنر شخصی -->
                 <div class="profile-banner relative">
-                    <button class="absolute bottom-2 left-2 bg-white/20 text-white text-[10px] p-1 rounded hover:bg-white/40 transition-all">تغییر بنر</button>
+                    <button class="absolute bottom-2 left-2 bg-white/20 text-white text-xs p-1 rounded hover:bg-white/40">ویرایش بنر</button>
                 </div>
-                
-                <!-- محتوای پروفایل -->
                 <div class="px-6 pb-6 text-center relative">
                     <div class="relative -mt-12 mb-4">
-                        <div class="w-24 h-24 bg-blue-100 rounded-full mx-auto border-4 border-white shadow-md flex items-center justify-center text-4xl overflow-hidden">
-                            <img id="profile-img" src="https://cdn-icons-png.flaticon.com/512/3774/3774279.png" alt="پروفایل" class="w-full h-full object-cover">
+                        <div class="w-24 h-24 bg-blue-100 rounded-full mx-auto border-4 border-white shadow-md flex items-center justify-center overflow-hidden">
+                            <img id="profile-img" src="https://cdn-icons-png.flaticon.com/512/3774/3774279.png" class="w-full h-full object-cover">
                         </div>
-                        <button class="absolute bottom-0 right-1/3 bg-blue-600 text-white p-1 rounded-full text-xs cursor-pointer hover:bg-blue-700 shadow-sm">✏️</button>
+                        <button class="absolute bottom-0 right-1/3 bg-blue-600 text-white p-1 rounded-full text-xs shadow-sm">✏️</button>
                     </div>
-                    
-                    <h2 id="doc-name" class="font-bold text-xl text-gray-800">...</h2>
+                    <h2 id="doc-name" class="font-bold text-2xl text-gray-800">...</h2>
                     <p id="doc-specialty" class="text-blue-600 text-sm mb-4">...</p>
                     
-                    <div class="flex justify-center gap-6 mb-6">
+                    <div class="flex justify-center gap-8 mb-6">
                         <div class="text-center">
-                            <span id="like-count" class="block font-bold text-gray-800 text-lg">۰</span>
+                            <span id="like-count" class="block font-bold text-gray-800 text-xl">۰</span>
                             <span class="text-xs text-gray-500">لایک</span>
                         </div>
-                        <div class="text-center border-x px-6 border-gray-100">
-                            <span id="follower-count" class="block font-bold text-gray-800 text-lg">۰</span>
+                        <div class="text-center border-x px-8 border-gray-100">
+                            <span id="follower-count" class="block font-bold text-gray-800 text-xl">۰</span>
                             <span class="text-xs text-gray-500">دنبال‌کننده</span>
                         </div>
                     </div>
+                </div>
+            </div>
 
-                    <hr class="my-4 border-gray-100">
-                    <h3 class="text-right font-bold text-gray-700 mb-4">پزشکان دیگر</h3>
-                    <div id="doctors-list" class="space-y-3 max-h-[400px] overflow-y-auto pr-1">
-                        <!-- لیست پزشکان لود می‌شود -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div class="lg:col-span-1 bg-white rounded-3xl p-6 shadow-sm border border-blue-100">
+                    <h3 class="text-right font-bold text-gray-700 mb-4">پزشکان پیشنهادی</h3>
+                    <div id="doctors-list" class="space-y-3 max-h-[500px] overflow-y-auto"></div>
+                </div>
+                <div class="lg:col-span-2 bg-white rounded-3xl p-6 shadow-sm border border-blue-100">
+                    <h3 class="font-bold text-gray-800 mb-4 text-right">اطلاعات تکمیلی</h3>
+                    <div class="space-y-4 text-right">
+                        <div class="flex justify-between p-3 bg-slate-50 rounded-xl border border-gray-100">
+                            <span class="text-gray-500 text-sm">وضعیت تایید:</span>
+                            <span id="status-text" class="font-bold text-gray-800 text-sm">در حال بررسی</span>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- ستون وسط و چپ: تعاملات و سوالات -->
-        <div class="lg:col-span-2 space-y-6">
-
-            <!-- بخش طرح سوال -->
+        <!-- بخش دوم: سوالات -->
+        <div id="questions-tab" class="tab-content hidden space-y-6">
             <div class="bg-white rounded-3xl p-6 shadow-sm border border-blue-100">
-                <h3 class="font-bold text-gray-800 mb-4 flex items-center gap-2">
-                    <span>❓ طرح سوال تخصصی</span>
-                </h3>
+                <h3 class="font-bold text-gray-800 mb-4 text-right">❓ طرح سوال تخصصی</h3>
                 <form id="question-form" class="space-y-3">
                     <input type="text" id="q-title" placeholder="عنوان سوال" required class="w-full px-4 py-2 rounded-xl border border-gray-200 outline-none focus:ring-2 focus:ring-blue-400 text-right">
                     <textarea id="q-content" placeholder="توضیحات کامل سوال..." rows="3" required class="w-full px-4 py-2 rounded-xl border border-gray-200 outline-none focus:ring-2 focus:ring-blue-400 text-right"></textarea>
                     <div class="flex gap-2">
                         <select id="q-specialty" required class="flex-1 px-4 py-2 rounded-xl border border-gray-200 outline-none focus:ring-2 focus:ring-blue-400 text-right bg-white cursor-pointer">
                             <option value="" disabled selected>انتخاب تخصص هدف...</option>
-                            <!-- تخصص‌ها از دیتابیس لود می‌شوند -->
                         </select>
                         <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded-xl font-bold hover:bg-blue-700 transition-all">ارسال</button>
                     </div>
                 </form>
             </div>
 
-            <!-- بخش سوالات دریافتی -->
-            <div class="bg-white rounded-3xl p-6 shadow-sm border border-blue-100">
-                <h3 class="font-bold text-gray-800 mb-4">سوالات مربوط به تخصص شما</h3>
-                <div id="my-questions" class="space-y-4">
-                    <!-- سوالات لود می‌شوند -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div>
+                    <h4 class="font-bold text-gray-700 text-right mb-2">🎯 تخصص شما (پاسخ نداده)</h4>
+                    <div id="my-questions" class="space-y-4"></div>
+                </div>
+                <div>
+                    <h4 class="font-bold text-gray-700 text-right mb-2">💬 تعاملات شما (پاسخ داده شده)</h4>
+                    <div id="interacted-questions" class="space-y-4"></div>
+                </div>
+                <div>
+                    <h4 class="font-bold text-gray-700 text-right mb-2">🌐 سایر سوالات</h4>
+                    <div id="other-questions" class="space-y-4"></div>
                 </div>
             </div>
         </div>
     </main>
 
-    <!-- مودال پاسخ به سوال -->
+    <!-- مودال پاسخ -->
     <div id="answer-modal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
         <div class="bg-white w-full max-w-md rounded-3xl p-6 shadow-2xl">
-            <h3 class="font-bold text-lg mb-4">ارسال پاسخ تخصصی</h3>
+            <h3 class="font-bold text-lg mb-4 text-right">ارسال پاسخ تخصصی</h3>
             <textarea id="answer-text" rows="4" class="w-full p-3 border rounded-xl outline-none focus:ring-2 focus:ring-blue-500 text-right" placeholder="پاسخ خود را بنویسید..."></textarea>
             <div class="flex justify-end gap-2 mt-4">
                 <button onclick="closeAnswerModal()" class="px-4 py-2 text-gray-500 font-medium">انصراف</button>
@@ -119,48 +130,49 @@
         window.onload = async function() {
             if (!currentUser) { window.location.href = 'index.html'; return; }
 
-            document.getElementById('doc-name').innerText = currentUser.name;
+            document.getElementById('doc-name').innerText = "دکتر " + currentUser.name;
             document.getElementById('doc-specialty').innerText = currentUser.specialty;
             if(currentUser.avatar_url) document.getElementById('profile-img').src = currentUser.avatar_url;
 
-            await loadSpecialties(); 
+            await loadSpecialties();
             await updateProfileStats();
             loadOtherDoctors();
-            loadMyQuestions();
+            loadQuestions();
         };
 
-        // لود تخصص‌های تعریف شده در دیتابیس
-        async function loadSpecialties() {
-            try {
-                const res = await fetch(`${SUPABASE_URL}/rest/v1/specialties?select=name`, {
-                    headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
-                });
-                const specs = await res.json();
-                const select = document.getElementById('q-specialty');
-                specs.forEach(s => {
-                    const opt = document.createElement('option');
-                    opt.value = s.name;
-                    opt.text = s.name;
-                    select.add(opt);
-                });
-            } catch (e) { console.error("خطا در لود تخصص‌ها:", e); }
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.add('hidden'));
+            document.getElementById(tabId).classList.remove('hidden');
+            document.getElementById('btn-profile').className = "flex-1 py-4 text-gray-500 transition-all";
+            document.getElementById('btn-questions').className = "flex-1 py-4 text-gray-500 transition-all";
+            if(tabId === 'profile-tab') document.getElementById('btn-profile').classList.add('tab-active');
+            else document.getElementById('btn-questions').classList.add('tab-active');
         }
 
-        // به‌روزرسانی آمار پروفایل
-        async function updateProfileStats() {
-            try {
-                const res = await fetch(`${SUPABASE_URL}/rest/v1/interactions?to_doctor_id=eq.${currentUser.id}&type=eq.like`, {
-                    headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
-                });
-                const likes = await res.json();
-                document.getElementById('like-count').innerText = likes.length;
+        async function loadSpecialties() {
+            const res = await fetch(`${SUPABASE_URL}/rest/v1/specialties?select=name`, {
+                headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
+            });
+            const specs = await res.json();
+            const select = document.getElementById('q-specialty');
+            specs.forEach(s => {
+                const opt = document.createElement('option');
+                opt.value = s.name; opt.text = s.name; select.add(opt);
+            });
+        }
 
-                const followRes = await fetch(`${SUPABASE_URL}/rest/v1/follows?to_doctor_id=eq.${currentUser.id}`, {
-                    headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
-                });
-                const follows = await followRes.json();
-                document.getElementById('follower-count').innerText = follows.length;
-            } catch (e) { console.error("خطا در لود آمار:", e); }
+        async function updateProfileStats() {
+            const resL = await fetch(`${SUPABASE_URL}/rest/v1/interactions?to_doctor_id=eq.${currentUser.id}&type=eq.like`, {
+                headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
+            });
+            const likes = await resL.json();
+            document.getElementById('like-count').innerText = likes.length;
+
+            const resF = await fetch(`${SUPABASE_URL}/rest/v1/follows?to_doctor_id=eq.${currentUser.id}`, {
+                headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
+            });
+            const follows = await resF.json();
+            document.getElementById('follower-count').innerText = follows.length;
         }
 
         async function loadOtherDoctors() {
@@ -173,19 +185,28 @@
 
             docs.filter(d => d.id !== currentUser.id).forEach(doc => {
                 const item = document.createElement('div');
-                item.className = "flex items-center justify-between p-3 bg-slate-50 rounded-2xl border border-gray-100";
+                item.className = "p-3 bg-slate-50 rounded-2xl border border-gray-100 flex items-center justify-between";
                 item.innerHTML = `
                     <div class="text-right">
-                        <div class="font-bold text-sm text-gray-800">${doc.name}</div>
+                        <div class="font-bold text-sm text-gray-800">دکتر ${doc.name}</div>
                         <div class="text-xs text-gray-500">${doc.specialty}</div>
                     </div>
-                    <div class="flex gap-2">
-                        <button onclick="interact('${doc.id}', 'like')" class="p-2 bg-white border rounded-lg hover:bg-green-50">👍</button>
-                        <button onclick="interact('${doc.id}', 'dislike')" class="p-2 bg-white border rounded-lg hover:bg-red-50">👎</button>
+                    <div class="flex gap-1">
+                        <button onclick="interact('${doc.id}', 'like')" class="p-1 bg-white border rounded-lg hover:bg-green-50">👍</button>
+                        <button onclick="followDoctor('${doc.id}')" class="px-2 py-1 bg-blue-50 text-blue-600 border border-blue-200 rounded-lg text-[10px] font-bold hover:bg-blue-600 hover:text-white transition-all">دنبال کردن</button>
                     </div>
                 `;
                 list.appendChild(item);
             });
+        }
+
+        async function followDoctor(toId) {
+            const res = await fetch(`${SUPABASE_URL}/rest/v1/follows`, {
+                method: 'POST',
+                headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json' },
+                body: JSON.stringify({ from_doctor_id: currentUser.id, to_doctor_id: toId })
+            });
+            if(res.ok) { alert("دنبال شد"); updateProfileStats(); }
         }
 
         async function interact(toId, type) {
@@ -194,7 +215,6 @@
                 headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json' },
                 body: JSON.stringify({ from_doctor_id: currentUser.id, to_doctor_id: toId, type: type })
             });
-            alert("تعامل شما ثبت شد");
             updateProfileStats();
         }
 
@@ -204,77 +224,4 @@
                 doctor_id: currentUser.id,
                 title: document.getElementById('q-title').value,
                 content: document.getElementById('q-content').value,
-                target_specialty: document.getElementById('q-specialty').value
-            };
-
-            const res = await fetch(`${SUPABASE_URL}/rest/v1/questions`, {
-                method: 'POST',
-                headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json' },
-                body: JSON.stringify(data)
-            });
-
-            if (res.ok) {
-                alert("سوال شما با موفقیت ارسال شد");
-                this.reset();
-                loadMyQuestions();
-            }
-        };
-
-        async function loadMyQuestions() {
-            const res = await fetch(`${SUPABASE_URL}/rest/v1/questions?target_specialty=eq.${currentUser.specialty}&select=*,profiles(name)`, {
-                headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
-            });
-            const qs = await res.json();
-            const container = document.getElementById('my-questions');
-            container.innerHTML = '';
-
-            qs.forEach(q => {
-                const item = document.createElement('div');
-                item.className = "p-4 bg-blue-50 rounded-2xl border border-blue-100 relative";
-                item.innerHTML = `
-                    <div class="font-bold text-gray-800">${q.title}</div>
-                    <div class="text-sm text-gray-600 mb-3">${q.content}</div>
-                    <div class="text-xs text-blue-500 mb-3">پرسیده شده توسط: ${q.profiles?.name || 'پزشک کاربر'}</div>
-                    <button onclick="openAnswerModal(${q.id})" class="bg-white border border-blue-300 text-blue-600 px-4 py-1 rounded-lg text-sm font-bold hover:bg-blue-600 hover:text-white transition-all">پاسخ دادن</button>
-                `;
-                container.appendChild(item);
-            });
-        }
-
-        function openAnswerModal(id) {
-            activeQuestionId = id;
-            document.getElementById('answer-modal').classList.remove('hidden');
-        }
-
-        function closeAnswerModal() {
-            document.getElementById('answer-modal').classList.add('hidden');
-        }
-
-        document.getElementById('submit-answer-btn').onclick = async function() {
-            const text = document.getElementById('answer-text').value;
-            const data = {
-                question_id: activeQuestionId,
-                doctor_id: currentUser.id,
-                answer_text: text
-            };
-
-            const res = await fetch(`${SUPABASE_URL}/rest/v1/answers`, {
-                method: 'POST',
-                headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json' },
-                body: JSON.stringify(data)
-            });
-
-            if (res.ok) {
-                alert("پاسخ شما ارسال شد");
-                closeAnswerModal();
-                document.getElementById('answer-text').value = '';
-            }
-        };
-
-        document.getElementById('logout-btn').onclick = function() {
-            localStorage.removeItem('currentUser');
-            window.location.href = 'index.html';
-        };
-    </script>
-</body>
-</html>
+                target_specialty:
