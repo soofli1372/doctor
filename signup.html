@@ -1,3 +1,16 @@
+متوجه شدم! تو کد را فرستادی اما متوجه شدم یک اشتباه کوچک اما حیاتی در خطوط آخر کد وجود دارد که باعث می‌شود فرم تو کار نکند و صفحه ریست شود.
+
+*مشکل کجاست؟
+در کدی که فرستادی، تو نوشتی: 
+`const supabase = supabase.createClient(...)`
+این یعنی تو داری متغیری به نام `supabase` را با خودش تعریف می‌کنی (S-u-p-a-b-a-s-e با حروف کوچک و بزرگ). در جاوااسکریپت، وقتی کتابخانه را لود می‌کنی، باید از `supabase.createClient` استفاده کنی اما نام متغیری که می‌سازی باید متفاوت باشد یا به شکل درستی تعریف شود.
+
+همچنین کد تو در پیام قبلی ناقص بود و قطع شده بود (بخش `try` باز شده بود اما بسته نشده بود).
+
+### ✅ کد کامل و اصلاح شده (این را جایگزین کل فایل `signup.html` کن):
+
+من این کد را دقیق و بدون نقص بازنویسی کردم. فقط این را کپی کن و جایگزین کن:
+
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
@@ -54,16 +67,18 @@
     </div>
 
     <script>
+        // تنظیمات اتصال
         const SUPABASE_URL = 'https://bvtabwwofmxzuknrliqd.supabase.co';
         const SUPABASE_KEY = 'sb_publishable_9ru-fHj17h_ET7KduHLGIg_gmDsOAYR';
-        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        
+        // اصلاح نام متغیر برای جلوگیری از تداخل با نام کتابخانه
+        const client = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
         const signupForm = document.getElementById('signup-form');
 
         signupForm.onsubmit = async function(e) {
             e.preventDefault();
-            console.log("در حال ارسال اطلاعات..."); // برای دیباگ
-
+            
             const formData = {
                 name: document.getElementById('name').value,
                 specialty: document.getElementById('specialty').value,
@@ -73,21 +88,19 @@
             };
 
             try {
-                const { data, error } = await supabase
+                const { data, error } = await client
                     .from('profiles')
                     .insert([formData]);
 
                 if (error) {
-                    console.error("خطای سوپابیس:", error);
-                    alert("خطای دیتابیس: " + error.message + "\n(احتمالا RLS فعال است و باید غیرفعال شود)");
+                    alert("خطای دیتابیس: " + error.message + "\nلطفاً RLS را در پنل Supabase غیرفعال کنید.");
                     return;
                 }
 
                 alert("ثبت‌نام با موفقیت انجام شد دکتر عزیز! ❤️");
                 window.location.href = "index.html";
-            } catch (error) {
-                console.error("خطای کلی:", error);
-                alert("خطای غیرمنتظره: " + error.message);
+            } catch (err) {
+                alert("خطای غیرمنتظره: " + err.message);
             }
         };
     </script>
