@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ثبت‌نام پزشکان</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- لود کتابخانه سوپابیس از یک منبع جایگزین و مطمئن -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase-js@2.39.0/dist/npm/@supabase-js.js"></script>
+    <!-- استفاده از یک CDN متفاوت و پایدارتر برای سوپابیس -->
+    <script src="https://unpkg.com/@supabase-js@2"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@100;400;700&display=swap');
         body { font-family: 'Vazirmatn', sans-serif; }
@@ -55,26 +55,39 @@
     </div>
 
     <script>
-        // استفاده از یک بلاک Try-Catch برای کل فرآیند مقداردهی اولیه
         let supabaseClient;
-        try {
-            const SUPABASE_URL = 'https://bvtabwwofmxzuknrliqd.supabase.co';
-            const SUPABASE_KEY = 'sb_publishable_9ru-fHj17h_ET7KduHLGIg_gmDsOAYR';
-            
-            // مقداردهی کلاینت با استفاده از متغیر جهانی supabase که توسط اسکریپت لود شده است
-            supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-            console.log("اتصال به سوپابیس برقرار شد");
-        } catch (e) {
-            console.error("خطا در لود سوپابیس:", e);
-            alert("خطا در لود کتابخانه دیتابیس. لطفاً صفحه را رفرش کنید.");
+        
+        // تابع برای مقداردهی اولیه با بررسی وجود کتابخانه
+        function initSupabase() {
+            try {
+                if (typeof supabase === 'undefined') {
+                    throw new Error("SupaBase Library not found");
+                }
+                const SUPABASE_URL = 'https://bvtabwwofmxzuknrliqd.supabase.co';
+                const SUPABASE_KEY = 'sb_publishable_9ru-fHj17h_ET7KduHLGIg_gmDsOAYR';
+                supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+                console.log("Connected successfully");
+            } catch (e) {
+                console.error("Initialization error:", e);
+            }
         }
+
+        // اجرای مقداردهی اولیه
+        initSupabase();
 
         const signupForm = document.getElementById('signup-form');
 
         signupForm.onsubmit = async function(e) {
-            e.preventDefault(); // جلوگیری از ریست شدن صفحه
+            e.preventDefault();
             
             const btn = document.getElementById('submit-btn');
+            
+            // بررسی مجدد در لحظه کلیک
+            if (!supabaseClient) {
+                alert("خطای اتصال: کتابخانه دیتابیس هنوز لود نشده است. لطفاً صفحه را رفرش کنید یا از یک مرورگر دیگر استفاده کنید.");
+                return;
+            }
+
             btn.innerText = "در حال ثبت‌نام...";
             btn.disabled = true;
 
@@ -87,23 +100,16 @@
             };
 
             try {
-                if (!supabaseClient) {
-                    throw new Error("کلاینت دیتابیس آماده نیست.");
-                }
-
                 const { data, error } = await supabaseClient
                     .from('profiles')
                     .insert([formData]);
 
-                if (error) {
-                    throw error; // انتقال به بخش catch
-                }
+                if (error) throw error;
 
                 alert("ثبت‌نام با موفقیت انجام شد دکتر عزیز! ❤️");
                 window.location.href = "index.html";
             } catch (err) {
-                console.error("SupaBase Error:", err);
-                alert("⚠️ خطا: " + err.message);
+                alert("⚠️ خطا: " + err.message + "\nاگر RLS را غیرفعال نکردید، الان انجام دهید.");
             } finally {
                 btn.innerText = "تکمیل ثبت‌نام";
                 btn.disabled = false;
