@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>داشبورد پزشک | پنل مدیریت</title>
+    <title>داشبورد تعاملی پزشکان</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@100;400;700&display=swap');
@@ -14,92 +14,198 @@
 
     <nav class="bg-white shadow-sm border-b border-blue-100 px-6 py-4 flex justify-between items-center">
         <div class="flex items-center gap-2">
-            <div class="bg-blue-600 p-2 rounded-lg">
-                <span class="text-white text-xl">⚕️</span>
-            </div>
-            <span class="font-bold text-gray-800 text-lg">پنل مدیریت پزشک</span>
+            <div class="bg-blue-600 p-2 rounded-lg text-white font-bold">⚕️</div>
+            <span class="font-bold text-gray-800 text-lg">شبکه تعاملی پزشکان</span>
         </div>
-        <button id="logout-btn" class="text-red-500 hover:bg-red-50 px-4 py-2 rounded-xl transition-all border border-red-200 font-medium">
-            خروج از حساب
-        </button>
+        <button id="logout-btn" class="text-red-500 hover:bg-red-50 px-4 py-2 rounded-xl transition-all border border-red-200 text-sm">خروج</button>
     </nav>
 
-    <main class="p-6 max-w-6xl mx-auto">
-        <div class="bg-gradient-to-r from-blue-600 to-blue-400 rounded-3xl p-8 text-white shadow-lg mb-8">
-            <h1 class="text-3xl font-bold mb-2">سلام دکتر <span id="doc-name">...</span> عزیز! 👋</h1>
-            <p class="opacity-90 text-lg">خوش آمدید. امروز چه کمکی را به بیماران خود می‌کنید؟</p>
-            <div class="mt-4 inline-block bg-white/20 px-4 py-1 rounded-full text-sm backdrop-blur-sm border border-white/30">
-                تخصص: <span id="doc-specialty">...</span>
+    <main class="p-4 max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+        <!-- ستون راست: پروفایل و تعاملات -->
+        <div class="lg:col-span-1 space-y-6">
+            <div class="bg-white rounded-3xl p-6 shadow-sm border border-blue-100 text-center">
+                <div id="my-profile-header" class="mb-4">
+                    <div class="w-20 h-20 bg-blue-100 rounded-full mx-auto flex items-center justify-center text-3xl mb-2">👨‍⚕️</div>
+                    <h2 id="doc-name" class="font-bold text-xl text-gray-800">...</h2>
+                    <p id="doc-specialty" class="text-blue-600 text-sm">...</p>
+                </div>
+                <hr class="my-4 border-gray-100">
+                <h3 class="text-right font-bold text-gray-700 mb-4">پزشکان دیگر</h3>
+                <div id="doctors-list" class="space-y-3 max-h-[500px] overflow-y-auto">
+                    <!-- لیست پزشکان اینجا لود می‌شود -->
+                </div>
             </div>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div class="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 hover:border-blue-500 transition-all cursor-pointer group" onclick="location.href='create_card.html'">
-                <div class="bg-blue-100 w-12 h-12 rounded-2xl flex items-center justify-center mb-4 group-hover:bg-blue-600 transition-colors">
-                    <span class="text-2xl">🪪</span>
-                </div>
-                <h3 class="text-xl font-bold text-gray-800 mb-2">ساخت کارت دیجیتال</h3>
-                <p class="text-gray-500 text-sm">طراحی و ایجاد کارت‌های معرفی هوشمند برای بیماران</p>
+        <!-- ستون وسط و چپ: سوالات و تعاملات -->
+        <div class="lg:col-span-2 space-y-6">
+
+            <!-- بخش طرح سوال -->
+            <div class="bg-white rounded-3xl p-6 shadow-sm border border-blue-100">
+                <h3 class="font-bold text-gray-800 mb-4 flex items-center gap-2">
+                    <span>❓ طرح سوال تخصصی</span>
+                </h3>
+                <form id="question-form" class="space-y-3">
+                    <input type="text" id="q-title" placeholder="عنوان سوال" required class="w-full px-4 py-2 rounded-xl border border-gray-200 outline-none focus:ring-2 focus:ring-blue-400 text-right">
+                    <textarea id="q-content" placeholder="توضیحات کامل سوال..." rows="3" required class="w-full px-4 py-2 rounded-xl border border-gray-200 outline-none focus:ring-2 focus:ring-blue-400 text-right"></textarea>
+                    <div class="flex gap-2">
+                        <input type="text" id="q-specialty" placeholder="تخصص مورد نظر برای پاسخ (مثلاً: چشم پزشکی)" required class="flex-1 px-4 py-2 rounded-xl border border-gray-200 outline-none focus:ring-2 focus:ring-blue-400 text-right">
+                        <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded-xl font-bold hover:bg-blue-700 transition-all">ارسال</button>
+                    </div>
+                </form>
             </div>
-            <div class="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 opacity-60">
-                <div class="bg-gray-100 w-12 h-12 rounded-2xl flex items-center justify-center mb-4">
-                    <span class="text-2xl">👥</span>
+
+            <!-- بخش سوالات دریافتی -->
+            <div class="bg-white rounded-3xl p-6 shadow-sm border border-blue-100">
+                <h3 class="font-bold text-gray-800 mb-4">سوالات مربوط به تخصص شما</h3>
+                <div id="my-questions" class="space-y-4">
+                    <!-- سوالات اینجا لود می‌شوند -->
                 </div>
-                <h3 class="text-xl font-bold text-gray-800 mb-2">مدیریت بیماران</h3>
-                <p class="text-gray-500 text-sm">این بخش در حال توسعه است و به زودی فعال می‌شود</p>
-            </div>
-            <div class="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 hover:border-blue-500 transition-all cursor-pointer group">
-                <div class="bg-blue-100 w-12 h-12 rounded-2xl flex items-center justify-center mb-4 group-hover:bg-blue-600 transition-colors">
-                    <span class="text-2xl">⚙️</span>
-                </div>
-                <h3 class="text-xl font-bold text-gray-800 mb-2">تنظیمات حساب</h3>
-                <p class="text-gray-500 text-sm">ویرایش اطلاعات شخصی و امنیتی پنل کاربری</p>
             </div>
         </div>
     </main>
 
+    <!-- مودال پاسخ به سوال -->
+    <div id="answer-modal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+        <div class="bg-white w-full max-w-md rounded-3xl p-6 shadow-2xl">
+            <h3 class="font-bold text-lg mb-4">ارسال پاسخ تخصصی</h3>
+            <textarea id="answer-text" rows="4" class="w-full p-3 border rounded-xl outline-none focus:ring-2 focus:ring-blue-500 text-right" placeholder="پاسخ خود را بنویسید..."></textarea>
+            <div class="flex justify-end gap-2 mt-4">
+                <button onclick="closeAnswerModal()" class="px-4 py-2 text-gray-500 font-medium">انصراف</button>
+                <button id="submit-answer-btn" class="bg-blue-600 text-white px-6 py-2 rounded-xl font-bold">ارسال پاسخ</button>
+            </div>
+        </div>
+    </div>
+
     <script>
+        const SUPABASE_URL = 'https://bvtabwwofmxzuknrliqd.supabase.co';
+        const SUPABASE_KEY = 'sb_publishable_9ru-fHj17h_ET7KduHLGIg_gmDsOAYR';
+        let currentUser = JSON.parse(localStorage.getItem('currentUser'));
+        let activeQuestionId = null;
+
         window.onload = async function() {
-            const user = JSON.parse(localStorage.getItem('currentUser'));
-            
-            if (!user) {
-                window.location.href = 'index.html';
-                return;
+            if (!currentUser) { window.location.href = 'index.html'; return; }
+
+            document.getElementById('doc-name').innerText = currentUser.name;
+            document.getElementById('doc-specialty').innerText = currentUser.specialty;
+
+            loadOtherDoctors();
+            loadMyQuestions();
+        };
+
+        // لود پزشکان دیگر و سیستم لایک/دیس‌لایک
+        async function loadOtherDoctors() {
+            const res = await fetch(`${SUPABASE_URL}/rest/v1/profiles?select=`, {
+                headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
+            });
+            const docs = await res.json();
+            const list = document.getElementById('doctors-list');
+            list.innerHTML = '';
+
+            docs.filter(d => d.id !== currentUser.id).forEach(doc => {
+                const item = document.createElement('div');
+                item.className = "flex items-center justify-between p-3 bg-slate-50 rounded-2xl border border-gray-100";
+                item.innerHTML = `
+                    <div class="text-right">
+                        <div class="font-bold text-sm text-gray-800">${doc.name}</div>
+                        <div class="text-xs text-gray-500">${doc.specialty}</div>
+                    </div>
+                    <div class="flex gap-2">
+                        <button onclick="interact('${doc.id}', 'like')" class="p-2 bg-white border rounded-lg hover:bg-green-50">👍</button>
+                        <button onclick="interact('${doc.id}', 'dislike')" class="p-2 bg-white border rounded-lg hover:bg-red-50">👎</button>
+                    </div>
+                `;
+                list.appendChild(item);
+            });
+        }
+
+        async function interact(toId, type) {
+            await fetch(`${SUPABASE_URL}/rest/v1/interactions`, {
+                method: 'POST',
+                headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json' },
+                body: JSON.stringify({ from_doctor_id: currentUser.id, to_doctor_id: toId, type: type })
+            });
+            alert("تعامل شما ثبت شد");
+        }
+
+        // سیستم سوالات
+        document.getElementById('question-form').onsubmit = async function(e) {
+            e.preventDefault();
+            const data = {
+                doctor_id: currentUser.id,
+                title: document.getElementById('q-title').value,
+                content: document.getElementById('q-content').value,
+                target_specialty: document.getElementById('q-specialty').value
+            };
+
+            const res = await fetch(`${SUPABASE_URL}/rest/v1/questions`, {
+                method: 'POST',
+                headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+
+            if (res.ok) {
+                alert("سوال شما با موفقیت ارسال شد");
+                this.reset();
+                loadMyQuestions();
             }
+        };
 
-            const SUPABASE_URL = 'https://bvtabwwofmxzuknrliqd.supabase.co';
-            const SUPABASE_KEY = 'sb_publishable_9ru-fHj17h_ET7KduHLGIg_gmDsOAYR';
+        async function loadMyQuestions() {
+            const res = await fetch(`${SUPABASE_URL}/rest/v1/questions?target_specialty=eq.${currentUser.specialty}&select=*,profiles(name)`, {
+                headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
+            });
+            const qs = await res.json();
+            const container = document.getElementById('my-questions');
+            container.innerHTML = '';
 
-            try {
-                // تایید هویت کاربر از طریق دیتابیس (بدون کتابخانه)
-                const response = await fetch(`${SUPABASE_URL}/rest/v1/profiles?select=*&id=eq.${user.id}`, {
-                    headers: {
-                        'apikey': SUPABASE_KEY,
-                        'Authorization': `Bearer ${SUPABASE_KEY}`
-                    }
-                });
+            qs.forEach(q => {
+                const item = document.createElement('div');
+                item.className = "p-4 bg-blue-50 rounded-2xl border border-blue-100 relative";
+                item.innerHTML = `
+                    <div class="font-bold text-gray-800">${q.title}</div>
+                    <div class="text-sm text-gray-600 mb-3">${q.content}</div>
+                    <div class="text-xs text-blue-500 mb-3">پرسیده شده توسط: ${q.profiles?.name || 'پزشک کاربر'}</div>
+                    <button onclick="openAnswerModal(${q.id})" class="bg-white border border-blue-300 text-blue-600 px-4 py-1 rounded-lg text-sm font-bold hover:bg-blue-600 hover:text-white transition-all">پاسخ دادن</button>
+                `;
+                container.appendChild(item);
+            });
+        }
 
-                const data = await response.json();
+        function openAnswerModal(id) {
+            activeQuestionId = id;
+            document.getElementById('answer-modal').classList.remove('hidden');
+        }
 
-                if (!data || data.length === 0) {
-                    alert("خطای دسترسی! لطفاً مجدداً وارد شوید.");
-                    localStorage.removeItem('currentUser');
-                    window.location.href = 'index.html';
-                } else {
-                    const doc = data[0];
-                    document.getElementById('doc-name').innerText = doc.name;
-                    document.getElementById('doc-specialty').innerText = doc.specialty;
-                }
-            } catch (err) {
-                console.error("Error:", err);
+        function closeAnswerModal() {
+            document.getElementById('answer-modal').classList.add('hidden');
+        }
+
+        document.getElementById('submit-answer-btn').onclick = async function() {
+            const text = document.getElementById('answer-text').value;
+            const data = {
+                question_id: activeQuestionId,
+                doctor_id: currentUser.id,
+                answer_text: text
+            };
+
+            const res = await fetch(`${SUPABASE_URL}/rest/v1/answers`, {
+                method: 'POST',
+                headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+
+            if (res.ok) {
+                alert("پاسخ شما ارسال شد");
+                closeAnswerModal();
+                document.getElementById('answer-text').value = '';
             }
         };
 
         document.getElementById('logout-btn').onclick = function() {
-            if (confirm("آیا از خروج از پنل مطمئن هستید؟")) {
-                localStorage.removeItem('currentUser');
-                window.location.href = 'index.html';
-            }
+            localStorage.removeItem('currentUser');
+            window.location.href = 'index.html';
         };
     </script>
 </body>
