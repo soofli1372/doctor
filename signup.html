@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ثبت‌نام پزشکان</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@100;400;700&display=swap');
+        body { font-family: 'Vazirmatn', sans-serif; }
+    </style>
+</head>
+<body class="bg-blue-50 flex items-center justify-center min-h-screen p-4 py-12">
+
+    <div class="bg-white shadow-2xl rounded-3xl p-8 w-full max-w-lg border border-blue-100">
+
+        <div class="text-center mb-8">
+            <h1 class="text-2xl font-bold text-gray-800">ایجاد حساب کاربری</h1>
+            <p class="text-gray-500 text-sm mt-2">برای تایید عضویت، لطفاً اطلاعات دقیق خود را وارد کنید</p>
+        </div>
+
+        <form id="signup-form" class="space-y-5">
+            <!-- نام و نام خانوادگی -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">نام و نام خانوادگی</label>
+                <input type="text" id="signup-name" placeholder="مثال: دکتر محمد محمدی" 
+                    class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all">
+            </div>
+
+            <!-- تخصص -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">تخصص / رشته تحصیلی</label>
+                <input type="text" id="signup-specialty" placeholder="مثلاً: متخصص داخلی" 
+                    class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all">
+            </div>
+
+            <!-- شماره موبایل -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">شماره موبایل</label>
+                <input type="tel" id="signup-phone" placeholder="۰۹۱۲..." 
+                    class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all text-left" dir="ltr">
+            </div>
+
+            <!-- ایمیل (برای ورود لازم است) -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">ایمیل</label>
+                <input type="email" id="signup-email" placeholder="example@mail.com" 
+                    class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all text-left" dir="ltr">
+            </div>
+
+            <!-- رمز عبور (برای ورود لازم است) -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">رمز عبور</label>
+                <input type="password" id="signup-password" placeholder="**" 
+                    class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all text-left" dir="ltr">
+            </div>
+
+            <!-- آپلود مدرک نظام پزشکی -->
+            <div class="bg-blue-50 p-4 rounded-2xl border-2 border-dashed border-blue-200">
+                <label class="block text-sm font-bold text-blue-700 mb-2 text-center">آپلود عکس کارت نظام پزشکی</label>
+                <div class="flex flex-col items-center justify-center">
+                    <input type="file" id="doc-upload" class="hidden" accept="image/">
+                    <label for="doc-upload" class="cursor-pointer bg-white px-4 py-2 rounded-lg shadow-sm border border-blue-300 text-blue-600 hover:bg-blue-100 transition-all text-sm">
+                        انتخاب فایل از گالری
+                    </label>
+                    <p class="text-xs text-gray-400 mt-2">فقط فرمت JPG یا PNG (حداکثر ۵ مگابایت)</p>
+                </div>
+            </div>
+
+            <!-- دکمه ثبت‌نام -->
+            <button type="submit" id="btn-submit-signup"
+                class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl shadow-lg transition-all transform active:scale-95">
+                تکمیل ثبت‌نام و ارسال مدارک
+            </button>
+        </form>
+
+        <div class="mt-6 text-center">
+            <p class="text-gray-600 text-sm">
+                قبلاً ثبت‌نام کرده‌اید؟ 
+                <a href="index.html" class="text-blue-600 font-bold hover:underline">برگردید به صفحه ورود</a>
+            </p>
+        </div>
+    </div>
+
+
+    
+    <script>
+        const signupForm = document.getElementById('signup-form');
+
+        signupForm.onsubmit = function(e) {
+            e.preventDefault(); // جلوگیری از رفرش شدن صفحه
+
+            // دریافت مقادیر از طریق IDها
+            const name = document.getElementById('signup-name').value.trim();
+            const specialty = document.getElementById('signup-specialty').value.trim();
+            const phone = document.getElementById('signup-phone').value.trim();
+            const email = document.getElementById('signup-email').value.trim();
+            const password = document.getElementById('signup-password').value.trim();
+
+            // بررسی پر بودن فیلدهای ضروری
+            if(!name || !email || !password || !phone) {
+                alert("دکتر عزیز، لطفاً نام، ایمیل، شماره موبایل و رمز عبور را وارد کنید. 😊");
+                return;
+            }
+
+            // ایجاد شیء کاربر برای ذخیره
+            const user = {
+                name: name,
+                specialty: specialty,
+                phone: phone,
+                email: email,
+                password: password,
+                isVerified: false // چون هنوز مدارک بررسی نشده
+            };
+
+            // ذخیره در LocalStorage
+            let users = JSON.parse(localStorage.getItem('users')) || [];
+
+            // چک کردن تکراری نبودن ایمیل
+            const userExists = users.some(u => u.email === email);
+            if(userExists) {
+                alert("این ایمیل قبلاً ثبت شده است! ❌");
+                return;
+            }
+
+            users.push(user);
+            localStorage.setItem('users', JSON.stringify(users));
+
+            alert("ثبت‌نام با موفقیت انجام شد! 🎉 حالا می‌توانید وارد شوید.");
+            window.location.href = "index.html"; // انتقال به صفحه ورود
+        };
+    </script>
+
+
+</body>
+</html>

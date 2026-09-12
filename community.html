@@ -1,0 +1,126 @@
+
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تبادل علمی پزشکان</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@100;400;700&display=swap');
+        body { font-family: 'Vazirmatn', sans-serif; }
+    </style>
+</head>
+<body class="bg-slate-50 min-h-screen pb-24">
+
+    <!-- هدر -->
+    <header class="bg-white shadow-sm p-4 sticky top-0 z-10">
+        <div class="flex items-center justify-between">
+            <div class="flex items-center gap-4">
+                <a href="dashboard.html" class="text-2xl text-gray-600">➡️</a>
+                <h1 class="font-bold text-gray-800 text-lg">انجمن تبادل علمی</h1>
+            </div>
+            <button class="bg-blue-600 text-white p-2 px-4 rounded-xl text-sm font-bold shadow-md hover:bg-blue-700 transition-all">
+                + سوال جدید ✍️
+            </button>
+        </div>
+    </header>
+
+    <main class="p-4 space-y-6">
+        
+        <!-- بخش گفتگوهای داغ (Trending) -->
+        <section>
+            <h2 class="text-sm font-bold text-gray-500 mb-3">مباحث داغ امروز 🔥</h2>
+            <div class="flex gap-3 overflow-x-auto pb-2 no-scrollbar">
+                <div class="min-w-[120px] bg-orange-100 p-3 rounded-2xl border border-orange-200 text-center">
+                    <span class="text-xs font-bold text-orange-700">#قلب_و_عروق</span>
+                </div>
+                <div class="min-w-[120px] bg-blue-100 p-3 rounded-2xl border border-blue-200 text-center">
+                    <span class="text-xs font-bold text-blue-700">#دوز_داروها</span>
+                </div>
+                <div class="min-w-[120px] bg-green-100 p-3 rounded-2xl border border-green-200 text-center">
+                    <span class="text-xs font-bold text-green-700">#تجربیات_دستیاری</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- لیست سوالات و گفتگوها -->
+        <div class="space-y-4">
+            
+            <!-- پست ۱ -->
+            <div class="bg-white p-4 rounded-3xl shadow-sm border border-gray-100">
+                <div class="flex items-center gap-3 mb-3">
+                    <div class="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center text-lg">👨‍⚕️</div>
+                    <div class="flex-1">
+                        <h4 class="text-sm font-bold text-gray-800">دکتر امیر حسینی</h4>
+                        <p class="text-[10px] text-gray-400">۲ ساعت پیش • تخصص داخلی</p>
+                    </div>
+                    <button class="text-gray-400 text-sm">⋮</button>
+                </div>
+                <p class="text-sm text-gray-700 leading-relaxed mb-4">
+                    سلام همکاران عزیز، در مورد تشخیص افتراقی بیماری X در بیماران مسن، چه منابعی پیشنهاد می‌کنید؟ من از منبع Y استفاده کردم اما چند ابهامی داشتم.
+                </p>
+                <div class="flex justify-between items-center border-t pt-3 border-gray-50">
+                    <div class="flex gap-4">
+                        <button class="flex items-center gap-1 text-xs text-gray-500 hover:text-blue-600 transition-colors">
+                            <span>👍</span> <span class="font-medium">۱۲</span>
+                        </button>
+                        <button class="flex items-center gap-1 text-xs text-gray-500 hover:text-blue-600 transition-colors">
+                            <span>💬</span> <span class="font-medium">۵ پاسخ</span>
+                        </button>
+                    </div>
+                    <button class="text-xs font-bold text-blue-600 hover:underline">مشاهده پاسخ‌ها</button>
+                </div>
+            </div>
+
+            <!-- پست ۲ -->
+            <div class="bg-white p-4 rounded-3xl shadow-sm border border-gray-100">
+                <div class="flex items-center gap-3 mb-3">
+                    <div class="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center text-lg">👩‍⚕️</div>
+                    <div class="flex-1">
+                        <h4 class="text-sm font-bold text-gray-800">دکتر زهرا رضایی</h4>
+                        <p class="text-[10px] text-gray-400">۵ ساعت پیش • تخصص اطفال</p>
+                    </div>
+                    <button class="text-gray-400 text-sm">⋮</button>
+                </div>
+                <p class="text-sm text-gray-700 leading-relaxed mb-4">
+                    بچه‌ها کسی می‌دونه برای آزمون دستیاری 올해---، بهترین فلش‌کارت‌های بخش عفونی کدوم هستن؟
+                </p>
+                <div class="flex justify-between items-center border-t pt-3 border-gray-50">
+                    <div class="flex gap-4">
+                        <button class="flex items-center gap-1 text-xs text-gray-500 hover:text-blue-600 transition-colors">
+                            <span>👍</span> <span class="font-medium">۸</span>
+                        </button>
+                        <button class="flex items-center gap-1 text-xs text-gray-500 hover:text-blue-600 transition-colors">
+                            <span>💬</span> <span class="font-medium">۲ پاسخ</span>
+                        </button>
+                    </div>
+                    <button class="text-xs font-bold text-blue-600 hover:underline">مشاهده پاسخ‌ها</button>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- منوی پایین -->
+    <nav class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-6 py-3 flex justify-between items-center shadow-lg z-20">
+        <a href="dashboard.html" class="flex flex-col items-center text-gray-400 hover:text-blue-600">
+            <span class="text-xl">🏠</span>
+            <span class="text-[10px] font-bold">خانه</span>
+        </a>
+        <a href="market.html" class="flex flex-col items-center text-gray-400 hover:text-blue-600">
+            <span class="text-xl">🛒</span>
+            <span class="text-[10px] font-bold">بازارچه</span>
+        </a>
+        <a href="community.html" class="flex flex-col items-center text-blue-600">
+            <span class="text-xl">👥</span>
+            <span class="text-[10px] font-bold">تبادل علمی</span>
+        </a>
+        <a href="#" class="flex flex-col items-center text-gray-400 hover:text-blue-600">
+            <span class="text-xl">👤</span>
+            <span class="text-[10px] font-bold">پروفایل</span>
+        </a>
+    </nav>
+
+</body>
+</html>
