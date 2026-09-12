@@ -39,7 +39,11 @@
             </div>
             <div class="text-right">
                 <label class="block text-sm font-medium text-gray-700 mb-1">تخصص</label>
-                <input type="text" id="specialty" required class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-blue-500 outline-none text-right">
+                <!-- تغییر از input به select -->
+                <select id="specialty" required class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-blue-500 outline-none text-right bg-white">
+                    <option value="" disabled selected>انتخاب کنید...</option>
+                    <!-- تخصص‌ها از دیتابیس اینجا لود می‌شوند -->
+                </select>
             </div>
 
             <!-- کد ملی و شماره نظام پزشکی -->
@@ -49,7 +53,7 @@
             </div>
             <div class="text-left" dir="ltr">
                 <label class="block text-sm font-medium text-gray-700 mb-1 text-right">شماره نظام پزشکی</label>
-                <input type="text" id="medical_license_id" required class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-blue-500 outline-none text-left">
+                <input type="text" id="medical_license_id" required class="w-full px-4 py-3 rounded-xl border border-gray- la300 focus:ring-2 focus:ring-blue-500 outline-none text-left">
             </div>
 
             <!-- موبایل و رمز عبور -->
@@ -79,6 +83,29 @@
     </div>
 
     <script>
+        const SUPABASE_URL = 'https://bvtabwwofmxzuknrliqd.supabase.co';
+        const SUPABASE_KEY = 'sb_publishable_9ru-fHj17h_ET7KduHLGIg_gmDsOAYR';
+
+        // لود تخصص‌ها در هنگام باز شدن صفحه
+        window.onload = async function() {
+            try {
+                const res = await fetch(`${SUPABASE_URL}/rest/v1/specialties?select=name`, {
+                    headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
+                });
+                const specialties = await res.json();
+                const select = document.getElementById('specialty');
+
+                specialties.forEach(s => {
+                    const option = document.createElement('option');
+                    option.value = s.name;
+                    option.text = s.name;
+                    select.appendChild(option);
+                });
+            } catch (err) {
+                console.error("خطا در لود تخصص‌ها:", err);
+            }
+        };
+
         const signupForm = document.getElementById('signup-form');
 
         signupForm.onsubmit = async function(e) {
@@ -87,9 +114,6 @@
             const btn = document.getElementById('submit-btn');
             btn.innerText = "در حال ثبت‌نام و آپلود...";
             btn.disabled = true;
-
-            const SUPABASE_URL = 'https://bvtabwwofmxzuknrliqd.supabase.co';
-            const SUPABASE_KEY = 'sb_publishable_9ru-fHj17h_ET7KduHLGIg_gmDsOAYR';
 
             try {
                 // 1. آپلود عکس به Storage
