@@ -30,12 +30,13 @@
             </div>
             <div class="p-6 overflow-x-auto">
                 <table class="w-full text-right border-collapse">
-                    <thead>
-                        <tr class="text-gray-500 text-sm border-b">
-                            <th class="pb-3 font-medium">نام پزشک</th>
+                    <thead class="text-gray-500 text-sm border-b">
+                        <tr>
+                            <th class="pb-3 font-medium">نام نمایشی</th>
                             <th class="pb-3 font-medium">تخصص</th>
-                            <th class="pb-3 font-medium">ایمیل</th>
+                            <th class="pb-3 font-medium">کد ملی/نظام</th>
                             <th class="pb-3 font-medium">تلفن</th>
+                            <th class="pb-3 font-medium">مدارک</th>
                             <th class="pb-3 font-medium text-center">عملیات</th>
                         </tr>
                     </thead>
@@ -51,10 +52,10 @@
             <h2 class="text-xl font-bold text-gray-800 mb-6">مدیریت تخصص‌ها</h2>
             <div class="flex gap-3 mb-6">
                 <input type="text" id="new-category" placeholder="برای مثال پزشک عمومی ..." class="flex-1 px-4 py-2 rounded-xl border border-gray-300 outline-none focus:ring-2 focus:ring-blue-400 text-right">
-                <button id="add-category-btn" class="bg-green-600 text-white px-6 py-2 rounded-xl font-bold hover:bg-green-700 transition-all">افزودن</button>
+                <button id="add-category-btn" class="bg-green-600 text-white px-6 py-2 rounded-xl font-bold hover:bg-green-700 transition-all">افزودن تخصص</button>
             </div>
-            <div id="categories-list" class="flex flex-wrap gap-2">
-                <!-- تخصص‌ها اینجا لود می‌شوند -->
+            <div id="categories-list" class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                <!-- تخصص‌ها به صورت لیست-وار اینجا لود می‌شوند -->
             </div>
         </div>
     </main>
@@ -74,7 +75,7 @@
             loadCategories();
         };
 
-        // لود کاربران و مدیریت آن‌ها
+        // لود کاربران با اطلاعات جدید
         async function loadUsers() {
             const res = await fetch(`${SUPABASE_URL}/rest/v1/profiles?select=`, {
                 headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
@@ -85,14 +86,17 @@
 
             users.forEach(user => {
                 const tr = document.createElement('tr');
-                tr.className = "border-b last:border-0 hover:bg-gray-50 transition-all";
+                tr.className = "border-b hover:bg-gray-50 transition-all";
                 tr.innerHTML = `
-                    <td class="py-4 font-medium">${user.name}</td>
-                    <td class="py-4 text-sm text-gray-500">${user.specialty}</td>
-                    <td class="py-4 text-xs text-gray-400" dir="ltr">${user.email}</td>
-                    <td class="py-4 text-xs text-gray-400" dir="ltr">${user.phone}</td>
+                    <td class="py-4">${user.display_name || user.name}</td>
+                    <td class="py-4">${user.specialty}</td>
+                    <td class="py-4 text-xs text-gray-500">${user.national_code} / ${user.medical_license_id}</td>
+                    <td class="py-4" dir="ltr">${user.phone}</td>
+                    <td class="py-4">
+                        ${user.license_image_url ? `<a href="${user.license_image_url}" target="_blank" class="text-blue-600 underline text-xs">مشاهده کارت</a>` : 'ارسال نشده'}
+                    </td>
                     <td class="py-4 text-center">
-                        <button onclick="deleteUser('${user.id}')" class="text-red-500 hover:text-red-700 font-bold text-xs px-3 py-1 border border-red-200 rounded-lg">تایید / حذف کاربر</button>
+                        <button onclick="deleteUser('${user.id}')" class="text-red-500 hover:text-red-700 font-bold text-xs px-3 py-1 border border-red-200 rounded-lg">حذف</button>
                     </td>
                 `;
                 tbody.appendChild(tr);
@@ -109,22 +113,69 @@
             }
         }
 
-        // مدیریت تخصص‌ها (شبیه‌سازی شده با جدول جدید یا محلی)
+        // مدیریت تخصص‌ها (با جلوگیری از تکرار و ذخیره در دیتابیس)
+        async function loadCategories() {
+            const res = await fetch(`${SUPABASE_URL}/rest/v1/specialties?select=name&order=name.asc`, {
+                headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
+            });
+            const categories = await res.json();
+            const list = document.getElementById('categories-list');
+            list.innerHTML = '';
+
+            categories.forEach(cat => {
+                const item = document.createElement('div');
+                item.className = "flex justify-between items-center p-3 bg-slate-50 border border-gray-200 rounded-xl text-gray-700";
+                item.innerHTML = `
+                    <span>${cat.name}</span>
+                    <button onclick="deleteCategory('${cat.name}')" class="text-red-400 hover:text-red-600 text-xs">حذف</button>
+                `;
+                list.appendChild(item);
+            });
+        }
+
         document.getElementById('add-category-btn').onclick = async function() {
-            const name = document.getElementById('new-category').value;
+            const input = document.getElementById('new-category');
+            const name = input.value.trim();
             if (!name) return;
 
-            // اینجا می‌توانید یک جدول مخصوص categories بسازید، فعلاً برای نمایش سریع:
-            alert("دسته‌بندی " + name + " با موفقیت اضافه شد.");
-            document.getElementById('new-job').value = '';
-            loadCategories(); 
+            // 1. چک کردن تکراری نبودن تخصص
+            const checkRes = await fetch(`${SUPABASE_URL}/rest/v1/specialties?name=eq.${name}`, {
+                headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
+            });
+            const existing = await checkRes.json();
+
+            if (existing.length > 0) {
+                alert("این تخصص قبلاً اضافه شده است و تکراری می‌باشد! ❌");
+                return;
+            }
+
+            // 2. اضافه کردن به دیتابیس
+            const res = await fetch(`${SUPABASE_URL}/rest/v1/specialties`, {
+                method: 'POST',
+                headers: { 
+                    'apikey': SUPABASE_KEY, 
+                    'Authorization': `Bearer ${SUPABASE_KEY}`,
+                    'Content-Type': 'application/json' 
+                },
+                body: JSON.stringify({ name: name })
+            });
+
+            if (res.ok) {
+                input.value = '';
+                loadCategories();
+            } else {
+                alert("خطایی در ذخیره تخصص رخ داد.");
+            }
         };
 
-        async function loadCategories() {
-            // این بخش را می‌توانید به یک جدول واقعی در دیتابیس متصل کنید
-            const list = document.getElementById('categories-list');
-            list.innerHTML = `<span class="bg-gray-200 px-3 py-1 rounded-full text-sm text-gray-600">نمونه محله ۱</span>
-                               <span class="bg-gray-200 px-3 py-1 rounded-full text-sm text-gray-600">نمونه محله ۲</span>`;
+        async function deleteCategory(name) {
+            if (confirm(`آیا تخصص ${name} حذف شود؟`)) {
+                await fetch(`${SUPABASE_URL}/rest/v1/specialties?name=eq.${name}`, {
+                    method: 'DELETE',
+                    headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
+                });
+                loadCategories();
+            }
         }
 
         document.getElementById('logout-btn').onclick = function() {
