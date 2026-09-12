@@ -32,10 +32,11 @@
                 <table class="w-full text-right border-collapse">
                     <thead class="text-gray-500 text-sm border-b">
                         <tr>
-                            <th class="pb-3 font-medium">نام نمایشی</th>
+                            <th class="pb-3 font-medium">نام و نام خانوادگی</th>
                             <th class="pb-3 font-medium">تخصص</th>
-                            <th class="pb-3 font-medium">کد ملی/نظام</th>
-                            <th class="pb-3 font-medium">تلفن</th>
+                            <th class="pb-3 font-medium">کد ملی</th>
+                            <th class="pb-3 font-medium">نظام پزشکی</th>
+                            <th class="pb-3 font-medium">موبایل</th>
                             <th class="pb-3 font-medium">مدارک</th>
                             <th class="pb-3 font-medium text-center">عملیات</th>
                         </tr>
@@ -88,9 +89,10 @@
                 const tr = document.createElement('tr');
                 tr.className = "border-b hover:bg-gray-50 transition-all";
                 tr.innerHTML = `
-                    <td class="py-4">${user.display_name || user.name}</td>
+                    <td class="py-4">${user.first_name || user.last_name}</td>
                     <td class="py-4">${user.specialty}</td>
-                    <td class="py-4 text-xs text-gray-500">${user.national_code} / ${user.medical_license_id}</td>
+                    <td class="py-4 text-xs text-gray-500">${user.national_code}</td>
+                    <td class="py-4 text-xs text-gray-500">${user.medical_license_id}</td>
                     <td class="py-4" dir="ltr">${user.phone}</td>
                     <td class="py-4">
                         ${user.license_image_url ? `<a href="${user.license_image_url}" target="_blank" class="text-blue-600 underline text-xs">مشاهده کارت</a>` : 'ارسال نشده'}
