@@ -89,7 +89,7 @@
                 const tr = document.createElement('tr');
                 tr.className = "border-b hover:bg-gray-50 transition-all";
                 tr.innerHTML = `
-                    <td class="py-4">${user.first_name || user.last_name}</td>
+                    <td class="py-4">${user.first_name} ${user.last_name}</td>
                     <td class="py-4">${user.specialty}</td>
                     <td class="py-4 text-xs text-gray-500">${user.national_code}</td>
                     <td class="py-4 text-xs text-gray-500">${user.medical_license_id}</td>
