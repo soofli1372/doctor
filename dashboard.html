@@ -5,8 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>داشبورد پزشک | پنل مدیریت</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- اتصال به کتابخانه سوپابیس -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase-js@2"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@100;400;700&display=swap');
         body { font-family: 'Vazirmatn', sans-serif; }
@@ -14,7 +12,6 @@
 </head>
 <body class="bg-slate-50 min-h-screen">
 
-    <!-- نوار ناوبری (Navbar) -->
     <nav class="bg-white shadow-sm border-b border-blue-100 px-6 py-4 flex justify-between items-center">
         <div class="flex items-center gap-2">
             <div class="bg-blue-600 p-2 rounded-lg">
@@ -28,7 +25,6 @@
     </nav>
 
     <main class="p-6 max-w-6xl mx-auto">
-        <!-- بخش خوش‌آمدگویی -->
         <div class="bg-gradient-to-r from-blue-600 to-blue-400 rounded-3xl p-8 text-white shadow-lg mb-8">
             <h1 class="text-3xl font-bold mb-2">سلام دکتر <span id="doc-name">...</span> عزیز! 👋</h1>
             <p class="opacity-90 text-lg">خوش آمدید. امروز چه کمکی را به بیماران خود می‌کنید؟</p>
@@ -37,10 +33,7 @@
             </div>
         </div>
 
-        <!-- بخش دسترسی‌های سریع (Quick Actions) -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-
-            <!-- کارت ساخت کارت دیجیتال -->
             <div class="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 hover:border-blue-500 transition-all cursor-pointer group" onclick="location.href='create_card.html'">
                 <div class="bg-blue-100 w-12 h-12 rounded-2xl flex items-center justify-center mb-4 group-hover:bg-blue-600 transition-colors">
                     <span class="text-2xl">🪪</span>
@@ -48,8 +41,6 @@
                 <h3 class="text-xl font-bold text-gray-800 mb-2">ساخت کارت دیجیتال</h3>
                 <p class="text-gray-500 text-sm">طراحی و ایجاد کارت‌های معرفی هوشمند برای بیماران</p>
             </div>
-
-            <!-- کارت مدیریت بیماران (به زودی) -->
             <div class="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 opacity-60">
                 <div class="bg-gray-100 w-12 h-12 rounded-2xl flex items-center justify-center mb-4">
                     <span class="text-2xl">👥</span>
@@ -57,8 +48,6 @@
                 <h3 class="text-xl font-bold text-gray-800 mb-2">مدیریت بیماران</h3>
                 <p class="text-gray-500 text-sm">این بخش در حال توسعه است و به زودی فعال می‌شود</p>
             </div>
-
-            <!-- کارت تنظیمات حساب -->
             <div class="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 hover:border-blue-500 transition-all cursor-pointer group">
                 <div class="bg-blue-100 w-12 h-12 rounded-2xl flex items-center justify-center mb-4 group-hover:bg-blue-600 transition-colors">
                     <span class="text-2xl">⚙️</span>
@@ -66,49 +55,46 @@
                 <h3 class="text-xl font-bold text-gray-800 mb-2">تنظیمات حساب</h3>
                 <p class="text-gray-500 text-sm">ویرایش اطلاعات شخصی و امنیتی پنل کاربری</p>
             </div>
-
         </div>
     </main>
 
     <script>
-        // تنظیمات اتصال به Supabase
-        const SUPABASE_URL = 'https://bvtabwwofmxzuknrliqd.supabase.co';
-        const SUPABASE_KEY = 'sb_publishable_9ru-fHj17h_ET7KduHLGIg_gmDsOAYR';
-        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
-        // بررسی دسترسی کاربر
         window.onload = async function() {
             const user = JSON.parse(localStorage.getItem('currentUser'));
-
+            
             if (!user) {
-                // اگر کاربر وارد نشده بود، برگردان به صفحه ورود
                 window.location.href = 'index.html';
                 return;
             }
 
-            try {
-                // تایید هویت کاربر از طریق دیتابیس آنلاین (برای امنیت بیشتر)
-                const { data, error } = await supabase
-                    .from('profiles')
-                    .select('')
-                    .eq('id', user.id)
-                    .single();
+            const SUPABASE_URL = 'https://bvtabwwofmxzuknrliqd.supabase.co';
+            const SUPABASE_KEY = 'sb_publishable_9ru-fHj17h_ET7KduHLGIg_gmDsOAYR';
 
-                if (error || !data) {
+            try {
+                // تایید هویت کاربر از طریق دیتابیس (بدون کتابخانه)
+                const response = await fetch(`${SUPABASE_URL}/rest/v1/profiles?select=*&id=eq.${user.id}`, {
+                    headers: {
+                        'apikey': SUPABASE_KEY,
+                        'Authorization': `Bearer ${SUPABASE_KEY}`
+                    }
+                });
+
+                const data = await response.json();
+
+                if (!data || data.length === 0) {
                     alert("خطای دسترسی! لطفاً مجدداً وارد شوید.");
                     localStorage.removeItem('currentUser');
                     window.location.href = 'index.html';
                 } else {
-                    // نمایش اطلاعات واقعی از دیتابیس
-                    document.getElementById('doc-name').innerText = data.name;
-                    document.getElementById('doc-specialty').innerText = data.specialty;
+                    const doc = data[0];
+                    document.getElementById('doc-name').innerText = doc.name;
+                    document.getElementById('doc-specialty').innerText = doc.specialty;
                 }
             } catch (err) {
-                console.error("خطای دیتابیس:", err);
+                console.error("Error:", err);
             }
         };
 
-        // عملیات خروج
         document.getElementById('logout-btn').onclick = function() {
             if (confirm("آیا از خروج از پنل مطمئن هستید؟")) {
                 localStorage.removeItem('currentUser');
