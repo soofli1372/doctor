@@ -5,8 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ثبت‌نام پزشکان</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- استفاده از یک CDN متفاوت و پایدارتر برای سوپابیس -->
-    <script src="https://unpkg.com/@supabase-js@2"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@100;400;700&display=swap');
         body { font-family: 'Vazirmatn', sans-serif; }
@@ -55,41 +53,18 @@
     </div>
 
     <script>
-        let supabaseClient;
-        
-        // تابع برای مقداردهی اولیه با بررسی وجود کتابخانه
-        function initSupabase() {
-            try {
-                if (typeof supabase === 'undefined') {
-                    throw new Error("SupaBase Library not found");
-                }
-                const SUPABASE_URL = 'https://bvtabwwofmxzuknrliqd.supabase.co';
-                const SUPABASE_KEY = 'sb_publishable_9ru-fHj17h_ET7KduHLGIg_gmDsOAYR';
-                supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-                console.log("Connected successfully");
-            } catch (e) {
-                console.error("Initialization error:", e);
-            }
-        }
-
-        // اجرای مقداردهی اولیه
-        initSupabase();
-
         const signupForm = document.getElementById('signup-form');
 
         signupForm.onsubmit = async function(e) {
             e.preventDefault();
             
             const btn = document.getElementById('submit-btn');
-            
-            // بررسی مجدد در لحظه کلیک
-            if (!supabaseClient) {
-                alert("خطای اتصال: کتابخانه دیتابیس هنوز لود نشده است. لطفاً صفحه را رفرش کنید یا از یک مرورگر دیگر استفاده کنید.");
-                return;
-            }
-
             btn.innerText = "در حال ثبت‌نام...";
             btn.disabled = true;
+
+            // اطلاعات دیتابیس شما
+            const SUPABASE_URL = 'https://bvtabwwofmxzuknrliqd.supabase.co';
+            const SUPABASE_KEY = 'sb_publishable_9ru-fHj17h_ET7KduHLGIg_gmDsOAYR';
 
             const formData = {
                 name: document.getElementById('name').value,
@@ -100,16 +75,29 @@
             };
 
             try {
-                const { data, error } = await supabaseClient
-                    .from('profiles')
-                    .insert([formData]);
+                // ارسال مستقیم اطلاعات به دیتابیس بدون نیاز به کتابخانه
+                const response = await fetch(`${SUPABASE_URL}/rest/v1/profiles`, {
+                    method: 'POST',
+                    headers: {
+                        'apikey': SUPABASE_KEY,
+                        'Authorization': `Bearer ${SUPABASE_KEY}`,
+                        'Content-Type': 'application/json',
+                        'Prefer': 'return=minimal'
+                    },
+                    body: JSON.stringify(formData)
+                });
 
-                if (error) throw error;
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.message || 'خطایی در ثبت‌نام رخ داد');
+                }
 
                 alert("ثبت‌نام با موفقیت انجام شد دکتر عزیز! ❤️");
                 window.location.href = "index.html";
+
             } catch (err) {
-                alert("⚠️ خطا: " + err.message + "\nاگر RLS را غیرفعال نکردید، الان انجام دهید.");
+                console.error("Error:", err);
+                alert("⚠️ خطا: " + err.message + "\nحتماً RLS را در پنل Supabase غیرفعال کنید.");
             } finally {
                 btn.innerText = "تکمیل ثبت‌نام";
                 btn.disabled = false;
