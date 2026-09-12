@@ -66,9 +66,6 @@
                             <span class="text-xs text-gray-500">سوال</span>
                         </div>
                     </div>
-                    <div class="flex justify-center gap-2">
-                        <button class="bg-blue-600 text-white px-6 py-2 rounded-full text-sm hover:bg-blue-700 transition-all">ویرایش اطلاعات</button>
-                    </div>
                 </div>
             </div>
         </div>
@@ -84,7 +81,6 @@
                     <div class="flex flex-wrap gap-4 items-center">
                         <select id="q-specialty" class="p-3 rounded-xl border border-gray-200 outline-none focus:ring-2 focus:ring-blue-400">
                             <option value="">انتخاب تخصص مقصد...</option>
-                            <!-- تخصص‌ها لود می‌شوند -->
                         </select>
                         <input type="file" id="q-image" class="text-xs text-gray-500">
                         <button id="submit-q-btn" class="mr-auto bg-blue-600 text-white px-8 py-3 rounded-xl font-bold hover:bg-blue-700 transition-all">ارسال سوال</button>
@@ -92,7 +88,7 @@
                 </div>
             </div>
 
-            <!-- فیلترهای نمایش سوالات -->
+            <!-- فیلترها -->
             <div class="flex gap-2 overflow-x-auto pb-2">
                 <button onclick="loadQuestions('all')" class="q-filter-btn active-tab px-4 py-2 rounded-full bg-white border text-sm transition-all">جدیدترین‌ها</button>
                 <button onclick="loadQuestions('mine')" class="q-filter-btn px-4 py-2 rounded-full bg-white border text-sm transition-all">سوالات من</button>
@@ -100,9 +96,7 @@
             </div>
 
             <!-- لیست سوالات -->
-            <div id="questions-container" class="space-y-4">
-                <!-- سوالات اینجا لود می‌شوند -->
-            </div>
+            <div id="questions-container" class="space-y-4"></div>
         </div>
     </main>
 
@@ -127,37 +121,32 @@
             });
             const data = await res.json();
             const user = data[0];
-
-            document.getElementById('doc-full-name').innerText = `${user.first_name} ${user.last_name}`;
-            document.getElementById('doc-specialty').innerText = user.specialty;
-            if (user.avatar_url) document.getElementById('profile-img').src = user.avatar_url;
+            if (user) {
+                document.getElementById('doc-full-name').innerText = `${user.first_name} ${user.last_name}`;
+                document.getElementById('doc-specialty').innerText = user.specialty;
+                if (user.avatar_url) document.getElementById('profile-img').src = user.avatar_url;
+            }
         }
 
-        // تغییر تب‌ها
         function switchTab(tab) {
             document.querySelectorAll('.tab-content').forEach(t => t.classList.add('hidden'));
             document.getElementById(`tab-${tab}`).classList.remove('hidden');
-
             document.getElementById('tab-profile-btn').classList.remove('active-tab');
             document.getElementById('tab-interactions-btn').classList.remove('active-tab');
             document.getElementById(`tab-${tab}-btn`).classList.add('active-tab');
         }
 
-        // آپلود عکس پروفایل
         document.getElementById('avatar-input').onchange = async function(e) {
             const file = e.target.files[0];
             if (!file) return;
-
             const fileName = `avatars/${currentUser.id}_${Date.now()}`;
             const formData = new FormData();
             formData.append('file', file);
-
             const uploadRes = await fetch(`${SUPABASE_URL}/storage/v1/object/profiles/${fileName}`, {
                 method: 'POST',
                 headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` },
                 body: formData
             });
-
             if (uploadRes.ok) {
                 const url = `${SUPABASE_URL}/storage/v1/object/public/profiles/${fileName}`;
                 await fetch(`${SUPABASE_URL}/rest/v1/profiles?id=eq.${currentUser.id}`, {
@@ -166,11 +155,10 @@
                     body: JSON.stringify({ avatar_url: url })
                 });
                 document.getElementById('profile-img').src = url;
-                alert("عکس پروفایل با موفقیت به‌روز شد ✅");
+                alert("عکس پروفایل به‌روز شد ✅");
             }
         };
 
-        // لود تخصص‌ها برای منوی کشویی
         async function loadSpecialties() {
             const res = await fetch(`${SUPABASE_URL}/rest/v1/specialties?select=name`, {
                 headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
@@ -182,10 +170,8 @@
             });
         }
 
-        // لود سوالات با فیلترهای مختلف
         async function loadQuestions(filter) {
             let query = `questions?select=*,profiles(first_name,last_name,specialty)&order=created_at.desc`;
-
             if (filter === 'mine') query += `&doctor_id=eq.${currentUser.id}`;
             if (filter === 'referred') query += `&target_doctor_id=eq.${currentUser.id}`;
 
@@ -193,7 +179,6 @@
                 headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
             });
             const data = await res.json();
-
             const container = document.getElementById('questions-container');
             container.innerHTML = '';
 
@@ -219,14 +204,13 @@
             });
         }
 
-        // ارسال سوال جدید
         document.getElementById('submit-q-btn').onclick = async function() {
             const title = document.getElementById('q-title').value;
             const content = document.getElementById('q-content').value;
             const specialty = document.getElementById('q-specialty').value;
             const file = document.getElementById('q-image').files[0];
 
-            if (!title || !content) return alert("لطفاً عنوان و متن سوال را وارد کنید.");
+            if (!title || !content) return alert("لطفاً عنوان و متن را وارد کنید.");
 
             let imageUrl = "";
             if (file) {
@@ -241,4 +225,31 @@
                 imageUrl = `${SUPABASE_URL}/storage/v1/object/public/questions/${fileName}`;
             }
 
-            const response = await fetch(`${SUPABASE_URL}/rest/v1/questions`,
+            const response = await fetch(`${SUPABASE_URL}/rest/v1/questions`, {
+                method: 'POST',
+                headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    doctor_id: currentUser.id,
+                    title: title,
+                    content: content,
+                    target_specialty: specialty,
+                    image_url: imageUrl,
+                    question_type: 'general'
+                })
+            });
+
+            if (response.ok) {
+                alert("سوال شما با موفقیت ارسال شد ✅");
+                loadQuestions('all');
+            } else {
+                alert("خطایی در ارسال رخ داد ❌");
+            }
+        };
+
+        document.getElementById('logout-btn').onclick = function() {
+            localStorage.clear();
+            window.location.href = 'index.html';
+        };
+    </script>
+</body>
+</html>
